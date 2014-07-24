@@ -1,18 +1,23 @@
+// Biblioteca para el trabajo con tarjetas de memoria
 #include <SD.h>
 
+// Opciones del menú
 int entrada;
 int opcion = 0;
 
+// Variables para la obtención de información de la tarjeta
 Sd2Card card;
 SdVolume volume;
 SdFile root;
 
-// Comunicación -> Pin 8
+// Comunicación del Shield SD -> Pin 8 (Arduino UNO)
 const int chipSelect = 8;
 
 void setup() {
+  // Inicialización de la comunicación serial
   Serial.begin(9600);
   
+  // Pin de salida, estandar para el trabajo con el Shield SD
   pinMode(10, OUTPUT);
   
   // Revisa si hay una tarjeta y si puede inicializarse:
@@ -23,21 +28,25 @@ void setup() {
   else {
     SD.begin(chipSelect);
     Serial.println("SD inicializada correctamente.");
+    // Se levanta el menú de opciones
     menu();
   }
 }
 
 void loop() {
-
+  // Retorno al menú de opciones
   if (Serial.available()){
     entrada=Serial.read();
     if(entrada=='*'){
       menu();
     }    
   }
-  
 }
 
+/* 
+  Esta función crea un menú de interacción
+  por medio de la comunicación serial.
+*/
 void menu(){
   int entradaMenu;
   Serial.println("MENU PRINCIPAL:");
@@ -87,6 +96,11 @@ void menu(){
     Serial.println("--> Presiona (*) para volver al menu");
 }
 
+/*
+  Función encargada de eliminar
+  un archivo de la tarjeta de memoria
+  especificado.
+*/
 void eliminarArchivo() {
   String nombre_archivo = "";
   
@@ -115,6 +129,10 @@ void eliminarArchivo() {
   }
 }
 
+/*
+  Función encargada de ver la información
+  contenida en un archivo de texto.
+*/
 void verArchivo() {
   String nombre_archivo = "";
   
@@ -152,6 +170,11 @@ void verArchivo() {
   }
 }
 
+/*
+  Función encargada de crear un archivo 
+  (junto con su contenido) y almacenarlo
+  en la tarjeta de memoria.
+*/
 void agregarArchivo() {
 
   String nombre_archivo = "";
@@ -190,6 +213,11 @@ void agregarArchivo() {
   }
 }
 
+/*
+  Función encargada de mostrar la información
+  de la tarjeta de memoria, además de la lista
+  de archivos contenidos en ella.
+*/
 void infoTarjeta() {
   // Inprime el tipo de tarjeta
   Serial.print("\nTipo de tarjeta: ");
@@ -215,9 +243,8 @@ void infoTarjeta() {
   
   // Se imprime el tipo y el tamaño de la partición
   uint32_t volumesize;
-  Serial.print("\nEl tipo de volumen es FAT");
+  Serial.print("El tipo de volumen es FAT");
   Serial.println(volume.fatType(), DEC);
-  Serial.println();
   
   volumesize = volume.blocksPerCluster();
   volumesize *= volume.clusterCount();
